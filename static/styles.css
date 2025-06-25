@@ -152,19 +152,23 @@ button[type="submit"]:hover {
     justify-content: center;
     background: none;
     border: none;
-    font-size: 18px;
     width: 24px;
     height: 24px;
     padding: 0;
     margin: 0;
-    color: red;
     cursor: pointer;
-    line-height: 1;
-    transform: translateY(-1px); /* minor vertical tweak */
 }
 
-.priority-btn.low {
-    color: rgba(255, 255, 255, 0.2);
+.priority-btn .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+    transition: background-color 0.2s;
+}
+
+.priority-btn.low .dot {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .delete-btn {
