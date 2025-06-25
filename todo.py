@@ -62,18 +62,6 @@ HTML_TEMPLATE = """
             cursor: pointer;
             border-radius: 0 8px 8px 0;
         }
-        .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #1e1e1e;
-            padding: 12px 16px;
-            margin: 8px 0;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-        }
         .task span {
             flex-grow: 1;
             margin-right: 10px;
@@ -81,14 +69,38 @@ HTML_TEMPLATE = """
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .delete-btn {
-            background-color: #444;
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        .task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e1e1e;
+    padding: 12px 16px;
+    margin: 8px 0;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+}
+
+.task-text {
+    flex-grow: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete-btn {
+    background-color: turquoise;
+    border: none;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 18px;
+}
         #task-list {
             list-style: none;
             padding: 0;
@@ -110,11 +122,10 @@ HTML_TEMPLATE = """
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
         <li class="task" draggable="true" data-index="{{ i }}">
-            <span>{{ task }}</span>
-            <form method="POST" action="/delete/{{ i }}" style="margin: 0;">
-                <button class="delete-btn" type="submit">X</button>
-            </form>
-        </li>
+    <span class="task-text">{{ task }}</span>
+    <button class="delete-btn" onclick="document.getElementById('form-{{ i }}').submit()">X</button>
+    <form id="form-{{ i }}" method="POST" action="/delete/{{ i }}" style="display: none;"></form>
+</li>
         {% endfor %}
     </ul>
 
