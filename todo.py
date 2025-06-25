@@ -37,7 +37,7 @@ HTML_TEMPLATE = """
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
-    <h1>Super Special To-Do List</h1>
+    <h1>Bruh's To-Do List</h1>
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
         <li class="task" data-index="{{ i }}">
@@ -52,7 +52,7 @@ HTML_TEMPLATE = """
 
     <div class="footer">
         <form id="add-form" method="POST" action="/add">
-            <input type="text" name="task" id="task-input" placeholder="Enter a task" required>
+            <input type="text" name="task" id="task-input" placeholder="Enter a task" required autocomplete="off">
             <button type="submit">Add</button>
         </form>
     </div>
@@ -60,6 +60,7 @@ HTML_TEMPLATE = """
     <script>
         const taskList = document.getElementById("task-list");
         const socket = io();
+        const input = document.getElementById("task-input");
 
         socket.on("new_task", function(data) {
             const i = taskList.children.length;
@@ -108,6 +109,21 @@ HTML_TEMPLATE = """
             fetch(`/toggle-priority/${index}`, { method: "POST" });
         }
 
+        // ✅ Handle Enter key + keep input focused
+        document.getElementById("add-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const task = input.value.trim();
+            if (!task) return;
+            fetch("/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `task=${encodeURIComponent(task)}`
+            }).then(() => {
+                input.value = "";
+                input.focus();
+            });
+        });
+
         Sortable.create(taskList, {
             animation: 150,
             onEnd: (evt) => {
@@ -136,7 +152,7 @@ def add():
         tasks.append(new_task)
         save_tasks()
         socketio.emit("new_task", {"task": new_task})
-    return redirect("/")
+    return ("", 204)
 
 @app.route("/delete/<int:index>", methods=["POST"])
 def delete(index):
