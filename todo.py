@@ -1,8 +1,10 @@
 from flask import Flask, render_template_string, request, redirect, jsonify
+from flask_socketio import SocketIO, emit
 import json
 import os
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 TASKS_FILE = "tasks.json"
 
@@ -25,6 +27,7 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <title>To-Do List</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -41,7 +44,7 @@ HTML_TEMPLATE = """
             background-color: #111;
             color: white;
             font-family: Arial, sans-serif;
-            padding-bottom: 100px; /* space for footer */
+            padding-bottom: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -147,14 +150,30 @@ HTML_TEMPLATE = """
     </ul>
 
     <div class="footer">
-        <form method="POST" action="/add">
-            <input type="text" name="task" placeholder="Enter a task" required>
+        <form id="add-form" method="POST" action="/add">
+            <input type="text" name="task" id="task-input" placeholder="Enter a task" required>
             <button type="submit">Add</button>
         </form>
     </div>
 
     <script>
         const taskList = document.getElementById("task-list");
+        const socket = io();
+
+        socket.on("new_task", function(data) {
+            const li = document.createElement("li");
+            li.className = "task";
+            li.setAttribute("draggable", "true");
+            li.setAttribute("data-index", taskList.children.length);
+
+            li.innerHTML = `
+                <span class="task-text">${data.task}</span>
+                <button class="delete-btn" onclick="document.getElementById('form-${taskList.children.length}').submit()">X</button>
+                <form id="form-${taskList.children.length}" method="POST" action="/delete/${taskList.children.length}" style="display: none;"></form>
+            `;
+            taskList.appendChild(li);
+        });
+
         let dragSrcIndex = null;
 
         taskList.addEventListener("dragstart", (e) => {
@@ -198,6 +217,7 @@ def add():
     if task:
         tasks.append(task)
         save_tasks()
+        socketio.emit("new_task", {"task": task})
     return redirect("/")
 
 @app.route("/delete/<int:index>", methods=["POST"])
@@ -219,4 +239,4 @@ def reorder():
     return jsonify(success=True)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    socketio.run(app, host="0.0.0.0", port=8080)
