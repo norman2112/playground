@@ -42,12 +42,10 @@ HTML_TEMPLATE = """
         {% for i, task in enumerate(tasks) %}
         <li class="task" data-index="{{ i }}">
             <span class="task-text">{{ task.text }}</span>
-            <div style="display: flex; gap: 8px;">
-                <button class="priority-btn {% if not task.priority %}low{% endif %}" onclick="togglePriority({{ i }})">
-                    <span class="dot"></span>
-                </button>
-                <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
-            </div>
+            <button class="priority-btn {% if not task.priority %}low{% endif %}" onclick="togglePriority({{ i }})">
+                <span class="dot"></span>
+            </button>
+            <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
         </li>
         {% endfor %}
     </ul>
@@ -70,12 +68,10 @@ HTML_TEMPLATE = """
             li.setAttribute("data-index", i);
             li.innerHTML = `
                 <span class="task-text">${data.task.text}</span>
-                <div style="display: flex; gap: 8px;">
-                    <button class="priority-btn low" onclick="togglePriority(${i})">
-                        <span class="dot"></span>
-                    </button>
-                    <button class="delete-btn" onclick="deleteTask(${i})">X</button>
-                </div>
+                <button class="priority-btn low" onclick="togglePriority(${i})">
+                    <span class="dot"></span>
+                </button>
+                <button class="delete-btn" onclick="deleteTask(${i})">X</button>
             `;
             taskList.appendChild(li);
         });
@@ -95,12 +91,10 @@ HTML_TEMPLATE = """
                 li.setAttribute("data-index", i);
                 li.innerHTML = `
                     <span class="task-text">${task.text}</span>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="priority-btn ${task.priority ? '' : 'low'}" onclick="togglePriority(${i})">
-                            <span class="dot"></span>
-                        </button>
-                        <button class="delete-btn" onclick="deleteTask(${i})">X</button>
-                    </div>
+                    <button class="priority-btn ${task.priority ? '' : 'low'}" onclick="togglePriority(${i})">
+                        <span class="dot"></span>
+                    </button>
+                    <button class="delete-btn" onclick="deleteTask(${i})">X</button>
                 `;
                 taskList.appendChild(li);
             });
