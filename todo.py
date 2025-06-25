@@ -23,24 +23,25 @@ tasks = load_tasks()
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <head>
     <meta charset="UTF-8">
     <title>To-Do List</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
-    <h1>My Special To-Do List</h1>
+    <h1>Bruh's To-Do List</h1>
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
         <li class="task" data-index="{{ i }}">
-            <span class="task-text">{{ task }}</span>
-            <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
+            <span class="task-text">{{ task.text }}</span>
+            <div style="display: flex; gap: 8px;">
+                <button class="priority-btn {% if not task.priority %}low{% endif %}" onclick="togglePriority({{ i }})">●</button>
+                <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
+            </div>
         </li>
         {% endfor %}
     </ul>
@@ -60,8 +61,11 @@ HTML_TEMPLATE = """
             const li = document.createElement("li");
             li.className = "task";
             li.innerHTML = `
-                <span class="task-text">${data.task}</span>
-                <button class="delete-btn" onclick="deleteTask(${taskList.children.length})">X</button>
+                <span class="task-text">${data.task.text}</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="priority-btn low" onclick="togglePriority(${taskList.children.length})">●</button>
+                    <button class="delete-btn" onclick="deleteTask(${taskList.children.length})">X</button>
+                </div>
             `;
             taskList.appendChild(li);
         });
@@ -80,8 +84,11 @@ HTML_TEMPLATE = """
                 li.className = "task";
                 li.setAttribute("data-index", i);
                 li.innerHTML = `
-                    <span class="task-text">${task}</span>
-                    <button class="delete-btn" onclick="deleteTask(${i})">X</button>
+                    <span class="task-text">${task.text}</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="priority-btn ${task.priority ? "" : "low"}" onclick="togglePriority(${i})">●</button>
+                        <button class="delete-btn" onclick="deleteTask(${i})">X</button>
+                    </div>
                 `;
                 taskList.appendChild(li);
             });
@@ -89,6 +96,10 @@ HTML_TEMPLATE = """
 
         function deleteTask(index) {
             fetch(`/delete/${index}`, { method: "POST" });
+        }
+
+        function togglePriority(index) {
+            fetch(`/toggle-priority/${index}`, { method: "POST" });
         }
 
         Sortable.create(taskList, {
@@ -114,9 +125,9 @@ def index():
 def add():
     task = request.form.get("task")
     if task:
-        tasks.append(task)
+        tasks.append({"text": task, "priority": False})
         save_tasks()
-        socketio.emit("new_task", {"task": task})
+        socketio.emit("new_task", {"task": {"text": task, "priority": False}})
     return redirect("/")
 
 @app.route("/delete/<int:index>", methods=["POST"])
@@ -138,6 +149,14 @@ def reorder():
         save_tasks()
         socketio.emit("tasks_reordered", {"tasks": tasks})
     return jsonify(success=True)
+
+@app.route("/toggle-priority/<int:index>", methods=["POST"])
+def toggle_priority(index):
+    if 0 <= index < len(tasks):
+        tasks[index]["priority"] = not tasks[index].get("priority", False)
+        save_tasks()
+        socketio.emit("tasks_reordered", {"tasks": tasks})
+    return ("", 204)
 
 @app.route("/static/<path:filename>")
 def static_files(filename):
