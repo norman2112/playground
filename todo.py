@@ -26,20 +26,78 @@ HTML_TEMPLATE = """
     <title>To-Do List</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-    padding-bottom: 100px; /* so task list doesn't get hidden */
+        * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+body {
+    background-color: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding-bottom: 100px; /* space for footer */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+h1 {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 24px 0;
+    text-align: center;
+}
+
+#task-list {
+    list-style: none;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 16px;
+}
+
+.task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e1e1e;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border-radius: 10px;
+    cursor: grab;
+}
+
+.task span {
+    flex-grow: 1;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: turquoise;
+    font-size: 18px;
+    cursor: pointer;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+/* Fixed footer input bar */
 .footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: #111;
-    padding: 12px 20px;
+    padding: 12px 16px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
     display: flex;
     justify-content: center;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
 }
 
 .footer form {
@@ -50,111 +108,24 @@ HTML_TEMPLATE = """
 
 input[type="text"] {
     flex-grow: 1;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
     border: none;
     border-radius: 8px 0 0 8px;
     background-color: #222;
     color: white;
-    width: 100%;
 }
 
 button[type="submit"] {
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 12px 20px;
+    font-size: 16px;
     background-color: turquoise;
     border: none;
     color: black;
     cursor: pointer;
     border-radius: 0 8px 8px 0;
+    min-width: 64px;
 }
-
-.delete-btn {
-    background: none;
-    border: none;
-    color: turquoise;
-    font-size: 20px;
-    cursor: pointer;
-    min-width: 32px;
-    min-height: 32px;
-}
-        h1 {
-            margin-bottom: 20px;
-        }
-        form {
-            display: flex;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px 0 0 8px;
-            background-color: #222;
-            color: white;
-        }
-        button[type="submit"] {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: turquoise;
-            border: none;
-            color: black;
-            cursor: pointer;
-            border-radius: 0 8px 8px 0;
-        }
-        .task span {
-            flex-grow: 1;
-            margin-right: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .task {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #1e1e1e;
-    padding: 12px 16px;
-    margin: 8px 0;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 500px;
-    overflow: hidden;
-}
-
-.task-text {
-    flex-grow: 1;
-    margin-right: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.delete-btn {
-    background-color: turquoise;
-    border: none;
-    color: black;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    min-width: 48px;
-    min-height: 48px;
-    font-size: 18px;
-}
-        #task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            max-width: 500px;
-        }
-        #task-list li {
-            cursor: grab;
-            user-select: none;
-        }
     </style>
 </head>
 <body>
