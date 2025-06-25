@@ -119,7 +119,8 @@ HTML_TEMPLATE = """
 
 @app.route("/")
 def index():
-    return render_template_string(HTML_TEMPLATE, tasks=tasks, enumerate=enumerate)
+    sorted_tasks = sorted(tasks, key=lambda x: not x.get("priority", False))
+    return render_template_string(HTML_TEMPLATE, tasks=sorted_tasks, enumerate=enumerate)
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -147,7 +148,8 @@ def reorder():
         task = tasks.pop(from_index)
         tasks.insert(to_index, task)
         save_tasks()
-        socketio.emit("tasks_reordered", {"tasks": tasks})
+        sorted_tasks = sorted(tasks, key=lambda x: not x.get("priority", False))
+        socketio.emit("tasks_reordered", {"tasks": sorted_tasks})
     return jsonify(success=True)
 
 @app.route("/toggle-priority/<int:index>", methods=["POST"])
@@ -155,7 +157,8 @@ def toggle_priority(index):
     if 0 <= index < len(tasks):
         tasks[index]["priority"] = not tasks[index].get("priority", False)
         save_tasks()
-        socketio.emit("tasks_reordered", {"tasks": tasks})
+        sorted_tasks = sorted(tasks, key=lambda x: not x.get("priority", False))
+        socketio.emit("tasks_reordered", {"tasks": sorted_tasks})
     return ("", 204)
 
 @app.route("/static/<path:filename>")
