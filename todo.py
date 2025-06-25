@@ -110,6 +110,7 @@ HTML_TEMPLATE = """
         }
         #task-list li {
             cursor: grab;
+            user-select: none;
         }
     </style>
 </head>
@@ -143,18 +144,21 @@ HTML_TEMPLATE = """
         });
 
         taskList.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const dropIndex = +e.target.closest("li").getAttribute("data-index");
-            if (dragSrcIndex !== null && dropIndex !== dragSrcIndex) {
-                fetch("/reorder", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ from: dragSrcIndex, to: dropIndex })
-                }).then(() => {
-                    location.reload();
-                });
-            }
+    e.preventDefault();
+    const li = e.target.closest("li");
+    if (!li) return;
+
+    const dropIndex = +li.getAttribute("data-index");
+    if (dragSrcIndex !== null && dropIndex !== dragSrcIndex) {
+        fetch("/reorder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ from: dragSrcIndex, to: dropIndex })
+        }).then(() => {
+            location.reload();
         });
+    }
+});
     </script>
 </body>
 </html>
