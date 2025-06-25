@@ -37,7 +37,7 @@ HTML_TEMPLATE = """
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
-    <h1>Bruh's To-Do List</h1>
+    <h1>Super Special To-Do List</h1>
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
         <li class="task" data-index="{{ i }}">
