@@ -146,6 +146,21 @@ button[type="submit"]:hover {
     background-color: #44ffee;
 }
 
+.priority-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    margin-right: 8px;
+    color: red;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+
+.priority-btn.low {
+    color: rgba(255,255,255,0.2);
+}
+
 /* ✨ New task animation */
 @keyframes fadeIn {
     from {
