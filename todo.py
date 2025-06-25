@@ -48,22 +48,27 @@ HTML_TEMPLATE = """
             cursor: pointer;
             border-radius: 0 8px 8px 0;
         }
-        .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #1e1e1e;
-            padding: 12px 16px;
-            margin: 8px 0;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 500px;
-            word-break: break-word;
-        }
-        .task span {
-            flex-grow: 1;
-            margin-right: 10px;
-        }
+       .task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e1e1e;
+    padding: 12px 16px;
+    margin: 8px 0;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.task span {
+    flex-grow: 1;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
         .delete-btn {
             background-color: #444;
             border: none;
