@@ -94,7 +94,7 @@ HTML_TEMPLATE = """
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template_string(HTML_TEMPLATE, tasks=tasks)
+    return render_template_string(HTML_TEMPLATE, tasks=tasks, enumerate=enumerate)
 
 @app.route("/add", methods=["POST"])
 def add():
