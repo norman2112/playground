@@ -1,13 +1,10 @@
-import eventlet
-eventlet.monkey_patch()
-
 from flask import Flask, render_template_string, request, redirect, jsonify
 from flask_socketio import SocketIO, emit
 import json
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app, async_mode='threading')
 
 TASKS_FILE = "tasks.json"
 
