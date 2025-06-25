@@ -43,7 +43,9 @@ HTML_TEMPLATE = """
         <li class="task" data-index="{{ i }}">
             <span class="task-text">{{ task.text }}</span>
             <div style="display: flex; gap: 8px;">
-                <button class="priority-btn {% if not task.priority %}low{% endif %}" onclick="togglePriority({{ i }})">●</button>
+                <button class="priority-btn {% if not task.priority %}low{% endif %}" onclick="togglePriority({{ i }})">
+                    <span class="dot"></span>
+                </button>
                 <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
             </div>
         </li>
@@ -62,13 +64,17 @@ HTML_TEMPLATE = """
         const socket = io();
 
         socket.on("new_task", function(data) {
+            const i = taskList.children.length;
             const li = document.createElement("li");
             li.className = "task";
+            li.setAttribute("data-index", i);
             li.innerHTML = `
                 <span class="task-text">${data.task.text}</span>
                 <div style="display: flex; gap: 8px;">
-                    <button class="priority-btn low" onclick="togglePriority(${taskList.children.length})">●</button>
-                    <button class="delete-btn" onclick="deleteTask(${taskList.children.length})">X</button>
+                    <button class="priority-btn low" onclick="togglePriority(${i})">
+                        <span class="dot"></span>
+                    </button>
+                    <button class="delete-btn" onclick="deleteTask(${i})">X</button>
                 </div>
             `;
             taskList.appendChild(li);
@@ -90,7 +96,9 @@ HTML_TEMPLATE = """
                 li.innerHTML = `
                     <span class="task-text">${task.text}</span>
                     <div style="display: flex; gap: 8px;">
-                        <button class="priority-btn ${task.priority ? "" : "low"}" onclick="togglePriority(${i})">●</button>
+                        <button class="priority-btn ${task.priority ? '' : 'low'}" onclick="togglePriority(${i})">
+                            <span class="dot"></span>
+                        </button>
                         <button class="delete-btn" onclick="deleteTask(${i})">X</button>
                     </div>
                 `;
@@ -130,9 +138,10 @@ def index():
 def add():
     task = request.form.get("task")
     if task:
-        tasks.append({"text": task, "priority": False})
+        new_task = {"text": task, "priority": False}
+        tasks.append(new_task)
         save_tasks()
-        socketio.emit("new_task", {"task": {"text": task, "priority": False}})
+        socketio.emit("new_task", {"task": new_task})
     return redirect("/")
 
 @app.route("/delete/<int:index>", methods=["POST"])
