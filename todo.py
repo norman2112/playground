@@ -126,6 +126,14 @@ button[type="submit"] {
     border-radius: 0 8px 8px 0;
     min-width: 64px;
 }
+html, body {
+    overscroll-behavior: none;
+    touch-action: manipulation;
+}
+#task-list {
+    user-select: none;
+    -webkit-user-drag: none;
+}
     </style>
 </head>
 <body>
@@ -153,6 +161,8 @@ button[type="submit"] {
         taskList.addEventListener("dragstart", (e) => {
             dragSrcIndex = +e.target.getAttribute("data-index");
             e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", ""); // suppress ghost drag text
+
         });
 
         taskList.addEventListener("dragover", (e) => {
