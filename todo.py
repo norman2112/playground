@@ -27,14 +27,57 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            background-color: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+    padding-bottom: 100px; /* so task list doesn't get hidden */
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.footer form {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    background-color: #222;
+    color: white;
+    width: 100%;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: turquoise;
+    border: none;
+    color: black;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: turquoise;
+    font-size: 20px;
+    cursor: pointer;
+    min-width: 32px;
+    min-height: 32px;
+}
         h1 {
             margin-bottom: 20px;
         }
@@ -115,17 +158,19 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
-    <h1>Basic To-Do List</h1>
-    <form method="POST" action="/add">
-        <input type="text" name="task" placeholder="Enter a task" required>
-        <button type="submit">Add</button>
-    </form>
+    <h1>Bruh's To-Do List</h1>
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
         <li class="task" draggable="true" data-index="{{ i }}">
     <span class="task-text">{{ task }}</span>
     <button class="delete-btn" onclick="document.getElementById('form-{{ i }}').submit()">X</button>
     <form id="form-{{ i }}" method="POST" action="/delete/{{ i }}" style="display: none;"></form>
+    <div class="footer">
+  <form method="POST" action="/add">
+      <input type="text" name="task" placeholder="Enter a task" required>
+      <button type="submit">Add</button>
+  </form>
+</div>
 </li>
         {% endfor %}
     </ul>
