@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, redirect, jsonify
+from flask import Flask, render_template_string, request, redirect, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 import json
 import os
@@ -27,121 +27,15 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <title>To-Do List</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html, body {
-        overscroll-behavior: none;
-        touch-action: manipulation;
-    }
-
-    body {
-        background-color: #111;
-        color: white;
-        font-family: Arial, sans-serif;
-        padding-bottom: 100px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100vw;
-        min-height: 100vh;
-    }
-
-    h1 {
-        font-size: 1.8em;
-        font-weight: bold;
-        margin: 24px 0;
-        text-align: center;
-    }
-
-    #task-list {
-        list-style: none;
-        width: 100%;
-        max-width: 500px;
-        padding: 0 16px;
-        user-select: none;
-        -webkit-user-drag: none;
-    }
-
-    .task {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #1e1e1e;
-        padding: 12px 16px;
-        margin: 10px 0;
-        border-radius: 10px;
-        cursor: grab;
-    }
-
-    .task span {
-        flex-grow: 1;
-        margin-right: 10px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .delete-btn {
-        background: none;
-        border: none;
-        color: turquoise;
-        font-size: 18px;
-        cursor: pointer;
-        min-width: 32px;
-        min-height: 32px;
-    }
-
-    .footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #111;
-        padding: 12px 16px;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
-        display: flex;
-        justify-content: center;
-    }
-
-    .footer form {
-        display: flex;
-        width: 100%;
-        max-width: 500px;
-    }
-
-    input[type="text"] {
-        flex-grow: 1;
-        padding: 12px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px 0 0 8px;
-        background-color: #222;
-        color: white;
-    }
-
-    button[type="submit"] {
-        padding: 12px 20px;
-        font-size: 16px;
-        background-color: turquoise;
-        border: none;
-        color: black;
-        cursor: pointer;
-        border-radius: 0 8px 8px 0;
-        min-width: 64px;
-    }
-</style>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <h1>Bruh's To-Do List</h1>
     <ul id="task-list">
         {% for i, task in enumerate(tasks) %}
-        <li class="task" draggable="true" data-index="{{ i }}">
+        <li class="task" data-index="{{ i }}">
             <span class="task-text">{{ task }}</span>
             <button class="delete-btn" onclick="deleteTask({{ i }})">X</button>
         </li>
@@ -159,12 +53,9 @@ HTML_TEMPLATE = """
         const taskList = document.getElementById("task-list");
         const socket = io();
 
-        // Handle new task
         socket.on("new_task", function(data) {
             const li = document.createElement("li");
             li.className = "task";
-            li.setAttribute("draggable", "true");
-            li.setAttribute("data-index", taskList.children.length);
             li.innerHTML = `
                 <span class="task-text">${data.task}</span>
                 <button class="delete-btn" onclick="deleteTask(${taskList.children.length})">X</button>
@@ -172,22 +63,18 @@ HTML_TEMPLATE = """
             taskList.appendChild(li);
         });
 
-        // Handle delete
         socket.on("task_deleted", function(data) {
             const items = document.querySelectorAll("#task-list li");
             if (data.index >= 0 && data.index < items.length) {
                 items[data.index].remove();
-                updateTaskIndices();
             }
         });
 
-        // Handle full reorder sync
         socket.on("tasks_reordered", function(data) {
             taskList.innerHTML = "";
             data.tasks.forEach((task, i) => {
                 const li = document.createElement("li");
                 li.className = "task";
-                li.setAttribute("draggable", "true");
                 li.setAttribute("data-index", i);
                 li.innerHTML = `
                     <span class="task-text">${task}</span>
@@ -198,41 +85,16 @@ HTML_TEMPLATE = """
         });
 
         function deleteTask(index) {
-            fetch(`/delete/${index}`, {
-                method: "POST"
-            });
+            fetch(`/delete/${index}`, { method: "POST" });
         }
 
-        function updateTaskIndices() {
-            document.querySelectorAll("#task-list li").forEach((li, i) => {
-                li.setAttribute("data-index", i);
-                li.querySelector("button").setAttribute("onclick", `deleteTask(${i})`);
-            });
-        }
-
-        let dragSrcIndex = null;
-
-        taskList.addEventListener("dragstart", (e) => {
-            dragSrcIndex = +e.target.getAttribute("data-index");
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", "");
-        });
-
-        taskList.addEventListener("dragover", (e) => {
-            e.preventDefault();
-        });
-
-        taskList.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const li = e.target.closest("li");
-            if (!li) return;
-
-            const dropIndex = +li.getAttribute("data-index");
-            if (dragSrcIndex !== null && dropIndex !== dragSrcIndex) {
+        Sortable.create(taskList, {
+            animation: 150,
+            onEnd: (evt) => {
                 fetch("/reorder", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ from: dragSrcIndex, to: dropIndex })
+                    body: JSON.stringify({ from: evt.oldIndex, to: evt.newIndex })
                 });
             }
         });
@@ -241,7 +103,7 @@ HTML_TEMPLATE = """
 </html>
 """
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
     return render_template_string(HTML_TEMPLATE, tasks=tasks, enumerate=enumerate)
 
@@ -273,6 +135,10 @@ def reorder():
         save_tasks()
         socketio.emit("tasks_reordered", {"tasks": tasks})
     return jsonify(success=True)
+
+@app.route("/static/<path:filename>")
+def static_files(filename):
+    return send_from_directory("static", filename)
 
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=5050)
