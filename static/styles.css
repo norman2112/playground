@@ -49,9 +49,11 @@ h1 {
 
 /* 🔮 Glassmorphic Task Card */
 .task {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
+    gap: 12px;
+
     padding: 14px 18px;
     margin: 12px 0;
     background: rgba(255, 255, 255, 0.05);
