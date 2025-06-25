@@ -50,8 +50,8 @@ HTML_TEMPLATE = """
         }
        .task {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     background-color: #1e1e1e;
     padding: 12px 16px;
     margin: 8px 0;
@@ -59,24 +59,23 @@ HTML_TEMPLATE = """
     width: 100%;
     max-width: 500px;
     overflow: hidden;
-    white-space: nowrap;
 }
 
-.task span {
-    flex-grow: 1;
-    margin-right: 10px;
+.task-text {
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-right: 10px;
 }
-        .delete-btn {
-            background-color: #444;
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+
+.delete-btn {
+    background-color: turquoise;
+    border: none;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -87,11 +86,10 @@ HTML_TEMPLATE = """
     </form>
     {% for i, task in enumerate(tasks) %}
         <div class="task">
-            <span>{{ task }}</span>
-            <form method="POST" action="/delete/{{ i }}" style="margin: 0;">
-                <button class="delete-btn" type="submit">X</button>
-            </form>
-        </div>
+    <span class="task-text">{{ task }}</span>
+    <button class="delete-btn" onclick="document.getElementById('form-{{ i }}').submit()">X</button>
+    <form id="form-{{ i }}" method="POST" action="/delete/{{ i }}" style="display: none;"></form>
+</div>
     {% endfor %}
 </body>
 </html>
